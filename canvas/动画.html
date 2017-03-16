@@ -1,0 +1,184 @@
+<html>
+<head>
+    <meta charset="gbk">
+    <title></title>
+</head>
+<body style="margin:0px;padding:0px;">
+</body>
+<canvas id="ctx" style="background-color:black">
+</canvas>
+<script type="text/javascript">
+
+    (function () {
+        var lastTime = 0;
+        var vendors = ['webkit', 'moz'];
+        for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
+                    window[vendors[x] + 'CancelRequestAnimationFrame'];
+        }
+
+        if (!window.requestAnimationFrame) {
+            window.requestAnimationFrame = function (callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+                var id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+        }
+        if (!window.cancelAnimationFrame) {
+            window.cancelAnimationFrame = function (id) {
+                clearTimeout(id);
+            };
+        }
+    }());
+
+    function Clip() {
+        var canvas = document.getElementById("ctx");
+        var self = this;
+        this.interval = null;
+        this.speed = 5;
+        canvas.addEventListener("click", function (evt) {
+            if (self.isMove == true) {
+                stop();
+                self.isMove = false;
+            } else {
+                move(1);
+                self.isMove = true;
+            }
+        })
+        //手动移动
+        window.addEventListener("keydown", function (evt) {
+            if (!self.isMove) {
+                //alert("干神马啦!");
+            }
+        }, true)
+        this.ctx = canvas.getContext("2d");
+        this.img = new Image();
+        this.img.src = "2.jpg";
+        //移动方向
+        this.delta = [3, 3];
+        //起始点
+        this.pos_x = 225;
+        this.pos_y = 120;
+        //半径
+        this.radius = 100;
+        //画布的长和宽
+        this.w = canvas.width = innerWidth || screen.width;
+        this.h = canvas.height = innerHeight || screen.height;
+        this.isMove = true;
+
+    }
+
+    Clip.prototype.draw1 = function () {
+        //碰撞检测
+        if (this.pos_x < this.radius) {
+            this.delta[0] = Math.random() % 4 + this.speed;
+        } else if (this.pos_x > this.w - this.radius) {
+            this.delta[0] = -(Math.random() % 4 + this.speed);
+        }
+        if (this.pos_y < this.radius) {
+            this.delta[1] = Math.random() % 4 + this.speed;
+        } else if (this.pos_y > this.h - this.radius) {
+            this.delta[1] = -(Math.random() % 4 + this.speed);
+        }
+        this.pos_x += this.delta[0];
+        this.pos_y += this.delta[1];
+        this.ctx.clearRect(0, 0, this.w, this.h);
+        //保存状态
+        this.ctx.save()
+        //移动变形
+        this.ctx.translate(this.pos_x, this.pos_y);
+        //设置裁剪区域
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, this.radius, 0, Math.PI * 2, true);
+        this.ctx.clip();
+        // 将图片画到画布上
+        this.ctx.drawImage(this.img, -this.pos_x, -this.pos_y, this.w, this.h);
+        //恢复状态
+        this.ctx.restore();
+    }
+
+    Clip.prototype.draw2 = function () {
+        //碰撞检测
+        if (this.pos_x < this.radius) {
+            this.delta[0] = Math.random() % 4 + this.speed;
+        } else if (this.pos_x > this.w - this.radius) {
+            this.delta[0] = -(Math.random() % 4 + this.speed);
+        }
+        if (this.pos_y < this.radius) {
+            this.delta[1] = Math.random() % 4 + this.speed;
+        } else if (this.pos_y > this.h - this.radius) {
+            this.delta[1] = -(Math.random() % 4 + this.speed);
+        }
+        this.pos_x += this.delta[0];
+        this.pos_y += this.delta[1];
+        this.ctx.clearRect(0, 0, this.w, this.h);
+        //绘制灰色的半透明蒙版
+        this.ctx.fillStyle = "rgba(0,0,0,1.0)"
+        this.ctx.fillRect(0, 0, this.w, this.h);
+        //保存状态
+        this.ctx.save()
+        //移动坐标
+        this.ctx.translate(this.pos_x, this.pos_y);
+        //裁剪透明的圆形区域
+        this.ctx.globalCompositeOperation = "xor";
+        this.ctx.fillStyle = "white"
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, this.radius, 0, Math.PI * 2, true);
+        this.ctx.fill();
+        // 将图片画到蒙版的下面，即只露出透明区域
+        this.ctx.globalCompositeOperation = "destination-over";
+        this.ctx.drawImage(this.img, -this.pos_x, -this.pos_y, this.w, this.h);
+        //恢复状态
+        this.ctx.restore();
+    }
+    function move(id) {
+        if (cl.interval)
+            clearInterval(cl.interval)
+        if (id == 1) {
+            cl.ctx.clearRect(0, 0, this.w, this.h);
+            cl.interval = setInterval(function () {
+                cl.draw1()
+            }, 20);
+        }
+        else {
+            cl.ctx.clearRect(0, 0, this.w, this.h);
+            cl.interval = setInterval(function () {
+                cl.draw2()
+            }, 20);
+        }
+    }
+    function stop() {
+        cl.ctx.clearRect(0, 0, cl.w, cl.h);
+        clearInterval(cl.interval);
+        clearInterval(cl.t);
+        var x = 0, y = 0;
+        cl.t=window.setInterval(function () {
+            //开始播放动画
+            cl.ctx.clearRect(0, 0, cl.w, cl.h);
+            var px = parseInt(cl.delta[0]);
+            var py = parseInt(cl.delta[1]);
+            //保存状态
+            cl.ctx.save()
+            //移动变形
+            cl.ctx.translate(px, py);
+            //设置裁剪区域
+            cl.ctx.beginPath();
+            cl.ctx.arc(100, 100, cl.radius, 0, Math.PI * 2, true);
+            cl.ctx.clip();
+            // 将图片画到画布上
+            cl.ctx.drawImage(cl.img, -x, -y, cl.w, cl.h);
+            x += 10;
+            y += 0;
+            //恢复状态
+            cl.ctx.restore()
+        }, 20)
+    }
+    var cl = new Clip();
+    move(1);
+</script>
+</html>

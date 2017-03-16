@@ -1,0 +1,188 @@
+<html>
+<head>
+    <title>抽奖啦</title>
+</head>
+<style type="text/css">
+    body{
+        background: #000;
+    }
+    #lottery2 {
+        position: absolute;
+    }
+
+    #lottery,#lottery3 {
+        position: absolute;
+        -o-transform: transform 6s ease-in-out;
+        -ms-transform: transform 6s ease-in-out;
+        -moz-transform: transform 6s ease-in-out;
+        -webkit-transform: transform 6 ease-in-out;
+        transition: transform 6s ease-in-out;
+        -o-transform-origin: 50% 50%;
+        -ms-transform-origin: 50% 50%;
+        -moz-transform-origin: 50% 50%;
+    }
+
+    #btn {
+        position: absolute;
+        left: 218px;
+        top: 218px;
+        height: 80px;
+        width: 80px;
+        border-radius: 50%;
+        cursor: pointer;
+        background: transparent;
+        border: 0px solid transparent;
+    }
+</style>
+<body>
+<canvas id="lottery2" width=500 height=500></canvas>
+<canvas id="lottery" width=500 height=500 onclick="mapBegin()"></canvas>
+<canvas id="lottery3" width=500 height=500 onclick="mapBegin()"></canvas>
+<!--<input type="button" id="btn" onclick="begin()"/>-->
+<script type="text/javascript">
+    var map = document.getElementById("lottery");
+    var map2 = document.getElementById("lottery2");
+    var map3 = document.getElementById("lottery3");
+    //画图对象
+    var ctx = map.getContext("2d");
+    var ctx2 = map2.getContext("2d");
+    var ctx3 = map3.getContext("2d");
+    //颜色
+    var color = ["#CE0000", "#006000", "#467500", "#408080", "#3C3C3C", "#90EE90", "#FF5809", "#005AB5", "#921AFF"];
+    //奖品
+    var info = ["日本", "美国", "韩国", "中国", "泰国", "瑞典", "德国", "法国"];
+    var info1 = ['一日游', '二日游', '三日游', '四日游', '五日游', '六日游', '七日游', '零日游'];
+    var count = 1;
+    var isover = true;
+    /**绘制外圆**/
+    var init = function () {
+        //定义填充颜色
+        ctx.fillStyle = "transparent";
+        //绘制奖品文字
+        var step = 2 * Math.PI / 8;
+        ctx2.textAlign = 'center';
+        ctx2.textBaseline = 'middle';
+        ctx2.font = " 20px Microsoft YaHei";
+        ctx2.fillStyle = "white";
+
+        for (var i = 0; i < 8; i++) {
+            //绘制圆形
+            var startAngle = Math.PI * (i / 4 - 1 / 8);
+            var endAngle = startAngle + Math.PI * (1 / 4);
+            ctx2.beginPath();
+            //画弧线
+            ctx2.arc(250, 250, 100, startAngle, endAngle, false);
+            var grd = ctx2.createRadialGradient(250, 250, 50, 250, 250, 120);
+            ctx2.lineWidth = 120;
+            grd.addColorStop(0, color[i]);
+            grd.addColorStop(1, color[i + 1])
+            //颜色
+            ctx2.strokeStyle = grd;//color[i]
+            //绘图
+            ctx2.stroke();
+        }
+        for (var j = 0; j < 8; j++) {
+            ctx2.save();
+            ctx2.beginPath();
+            ctx2.translate(250, 250);
+            //画布旋转的时候需要调用save方法保存
+            ctx2.rotate(j * step);
+            ctx2.fillText(info[j], 0, -120, 60);
+            ctx2.fillText(info1[j], 0, -95, 60);
+            ctx2.closePath();
+            ctx2.restore();
+        }
+
+        /** 绘制指针 **/
+        ctx.beginPath();
+        ctx.moveTo(250, 170);
+        ctx.lineTo(260, 230);
+        ctx.lineTo(240, 230);
+        //ctx.lineTo(250, 170);
+        ctx.closePath();
+        ctx.fillStyle = "#FF4350";
+        //ctx.strokeStyle = "#FF4350";
+        //ctx.stroke();
+        ctx.fill();
+
+        /**绘制文字**/
+        ctx3.font = "Bold 20px Microsoft YaHei";
+        ctx3.textAlign = 'start';
+        ctx3.textBaseline = 'middle';
+        ctx3.fillStyle = color[4];
+        /*ctx.shadowOffsetX = 3;
+         ctx.shadowOffsetY = 3;
+         ctx.shadowColor = "#666";
+         ctx.shadowBlur = 2;*/
+        ctx3.beginPath();
+        ctx3.fillText('开始', 232, 238, 100);
+        ctx3.fillText('抽奖', 232, 262, 100);
+        ctx3.fill();
+        ctx3.closePath();
+
+        /** 绘制内圆 **/
+        ctx.beginPath();
+        ctx.arc(250, 250, 40, 0, Math.PI * 2)
+        ctx.fillStyle = "#FF4350";
+        ctx.closePath();
+        ctx.fill();
+
+
+    }
+
+    //转盘滚动,只能画布旋转，所以需要多个画布
+    var begin = function () {
+        isover = false;
+        //开始滚动转盘,暂时给随机
+        var rotateArea = 2160 * count + Math.ceil(Math.random(0, 1) * 360);
+        map.style.webkitTransform = "rotate(" + rotateArea + "deg)";
+        map.style.MozTransform = "rotate(" + rotateArea + "deg)";
+        map.style.msTransform = "rotate(" + rotateArea + "deg)";
+        map.style.OTransform = "rotate(" + rotateArea + "deg)";
+        map.style.transform = "rotate(" + rotateArea + "deg)";
+
+       /* map3.style.webkitTransform = "rotate(" + rotateArea + "deg)";
+        map3.style.MozTransform = "rotate(" + rotateArea + "deg)";
+        map3.style.msTransform = "rotate(" + rotateArea + "deg)";
+        map3.style.OTransform = "rotate(" + rotateArea + "deg)";
+        map3.style.transform = "rotate(" + rotateArea + "deg)";*/
+
+        count++;
+        window.clearTimeout(window.setTimeout(function () {
+                    var p = 22.5;
+                    var a = 360;
+                    var d = 45;
+                    var rote = rotateArea % a;
+                    var s = "恭喜你啊~抽中了";
+                    if (rote < p || rote >= a - p) {
+                        isover = true;
+                        alert(s + info[0] + info1[0]);
+                    } else {
+                        for (var i = 0; i < 7; i++) {
+                            if (rote >= p + i * d && rote < p + (i + 1) * d) {
+                                isover = true;
+                                alert(s + info[i + 1] + info1[i + 1]);
+                                break;
+                            }
+                        }
+                    }
+                }, 6000) - 1);
+    }
+
+    //点击事件
+    var mapBegin = function (evt) {
+        if(!isover){
+            return;
+        }
+        var evt = evt || window.event;
+        var x = evt.clientX - map.offsetLeft;
+        var y = evt.clientY - map.offsetTop;
+        if (ctx.isPointInPath(x, y)) {
+            begin();
+        }
+    }
+    init();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PPT</title>
+
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .canvas {
+            background: #000;
+
+        }
+
+        #content {
+            background: #000;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+<canvas class="canvas" id="begin"></canvas>
+<div>
+    <canvas id="content" tabindex="0"></canvas>
+</div>
+<div class="overlay">
+    <div class="tabs">
+        <div class="tabs-labels"><span class="tabs-label"></span></div>
+        <div class="tabs-panels">
+            <ul class="tabs-panel commands"></ul>
+        </div>
+    </div>
+    <script src="js/index.js"></script>
+    <script src="js/base.js"></script>
+</body>
+
+</html>

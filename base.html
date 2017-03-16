@@ -1,0 +1,104 @@
+<html>
+<head>
+    <title>测试代码</title>
+</head>
+<canvas id="lottery" width=500 height=2000></canvas>
+<script type="text/javascript">
+    var map = document.getElementById("lottery");
+    /**理解最简单的画线**/
+    ctx = map.getContext("2d")
+    //画图对象
+    ctx.beginPath();
+    ctx.moveTo(100.5, 20.5);
+    ctx.lineTo(200.5, 20.5);
+    ctx.strokeStyle = '#000';
+    ctx.stroke();
+    //ctx.closePath();
+    ctx.beginPath();
+    ctx.moveTo(100.5, 40.5);
+    ctx.lineTo(200.5, 40.5);
+    //  ctx.lineTo(200.5,80.5);
+    //  ctx.closePath();
+    ctx.strokeStyle = '#f00';
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(100.5, 60.5);
+    ctx.lineTo(200.5, 60.5);
+    //宽度
+    ctx.lineWidth = 10;
+    //线帽样式
+    ctx.lineCap = "round";//butt,"round","square"
+    //链接样式
+    ctx.lineJoin = "round";//round,bevel,miter
+    ctx.closePath();
+    ctx.stroke();
+    /**理解最简单的画线**/
+
+
+    /**svae以及restore**/
+    for (var i = 1; i <= 5; i++) {
+        ctx.beginPath();
+        ctx.save();
+        ctx.translate(70, 100);
+        ctx.lineWidth = 1;
+        ctx.strokeRect(30 * i, 10, 20, 20);
+        ctx.restore();
+    }
+    /**svae以及restore**/
+
+
+    /** 图片合成的分解以及合成**/
+    var img1 = document.createElement("img");
+    img1.src = "image/test1.jpg";
+    //img1.crossOrigin = "Anonymous"
+
+    var img2 = document.createElement("img");
+    img2.src = "image/test2.jpg";
+    //img2.crossOrigin = "Anonymous"
+
+    var img3 = document.createElement("img");
+    img3.src = "image/test3.jpg";
+    //img3.crossOrigin = "Anonymous"
+
+    img1.onload = drawImage;
+    img2.onload = drawImage;
+    img3.onload = drawImage;
+    var imgurl = null;
+
+    function drawImage() {
+        if (img1.complete && img2.complete && img3.complete && null == imgurl) {
+            ctx.drawImage(img1, 100, 150, 100, 100);
+            ctx.drawImage(img3, 200, 150, 100, 100);
+            ctx.drawImage(img2, 300, 150, 100, 100);
+            imgurl = map.toDataURL('image/png');
+            var imgObj = new Image();
+            imgObj.src = imgurl;
+            document.body.appendChild(imgObj);
+        }
+    }
+
+    var img4 = document.createElement("img");
+    img4.src = "image/test4.jpg";
+    img4.onload = function () {
+        if (img4.complete) {
+            var w = Math.floor(img4.width / 5);
+            var h = Math.ceil(img4.height / 5);
+            ctx.drawImage(img4,100,250,img4.width,img4.height)
+            for (var i = 0; i < 5; i++) {
+                for(var j=0;j<5;j++){
+                    ctx.drawImage(img4, w*j, h*i , w, h, 100+j*(w+10), 500 + i * (h+10), w, h);
+                }
+            }
+        }
+    }
+    /** 图片合成的分解以及合成 **/
+
+    /**模拟事件处理**/
+    //不能模拟键盘事件
+    //不能用css来制定宽高
+
+    /**模拟事件处理**/
+
+</script>
+</body>
+</html>

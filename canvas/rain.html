@@ -1,0 +1,155 @@
+<html>
+<head>
+    <title>обсЙ</title>
+</head>
+<style type="text/css">
+</style>
+<body>
+<canvas id="cas" width=500 height=500></canvas>
+<script type="text/javascript">
+    (function () {
+        var lastTime = 0;
+        var vendors = ['webkit', 'moz'];
+        for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] ||
+                    window[vendors[x] + 'CancelRequestAnimationFrame'];
+        }
+
+        if (!window.requestAnimationFrame) {
+            window.requestAnimationFrame = function (callback, element) {
+                var currTime = new Date().getTime();
+                var timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
+                var id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                }, timeToCall);
+                lastTime = currTime + timeToCall;
+                return id;
+            };
+        }
+        if (!window.cancelAnimationFrame) {
+            window.cancelAnimationFrame = function (id) {
+                clearTimeout(id);
+            };
+        }
+    }());
+
+    (function () {
+        var h = document.getElementById("cas"), n = h.getContext("2d"), o, a, p = [], f = function (t, g) {
+            return Math.random() * (g - t) + t
+        }, s = function () {
+            o = h.width = innerWidth;
+            a = h.height = innerHeight
+        }, i = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || function (g) {
+                    setTimeout(g, 16.667)
+                };
+
+        function b() {
+            this.ox = f(o * 0.2, o);
+            this.oy = 0;
+            this.angle = f(20, 30);
+            this.ty = f(a * 0.4, a);
+            this.x = this.ox;
+            this.y = this.oy;
+            this.speed = 8;
+            this.r = f(8, 16);
+            this.opacity = f(0.6, 1)
+        }
+
+        b.prototype.drop = function () {
+            if (this.y < this.ty) {
+                n.beginPath();
+                n.strokeStyle = "rgba(255,255,255," + this.opacity + ")";
+                n.moveTo(this.x, this.y);
+                this.speed *= 1.02;
+                this.y += this.speed;
+                this.x = this.ox - Math.tan(this.angle * Math.PI / 180) * this.y;
+                n.lineTo(this.x, this.y);
+                n.stroke();
+                n.closePath();
+                return false
+            }
+            return this.ripple()
+        };
+        b.prototype.ripple = function () {
+            if (this.opacity > 0) {
+                n.save();
+                n.beginPath();
+                this.r += 1;
+                n.fillStyle = "rgb(0,0,0)";
+                n.strokeStyle = "rgba(255,255,255," + this.opacity + ")";
+                n.scale(1, 0.6);
+                n.arc(this.x, this.y / 0.6, this.r, 0, Math.PI * 2);
+                n.fill();
+                n.stroke();
+                n.closePath();
+                n.restore();
+                this.opacity -= 0.05;
+                return false
+            }
+            return true
+        };
+        function k() {
+            n.fillStyle = "rgba(0,0,0,0.8)";
+            n.fillRect(0, 0, o, a);
+            var g = p.length;
+            if (r / c > g) {
+                p.push(new b());
+                g++
+            }
+            while (g--) {
+                if (p[g].drop()) {
+                    p.splice(g, 1)
+                }
+            }
+            for (g in m) {
+                if (Math.abs(e - g) < 0.2) {
+                    l = m[g];
+                    break
+                }
+            }
+            if (l) {
+                n.font = "normal 30px arial";
+                n.fillStyle = "rgb(255,255,255)";
+                g = n.measureText(l).width;
+                n.fillText(l, (o - g) / 2, a - 50)
+            }
+            i(k)
+        }
+
+        window.addEventListener("resize", s, false);
+        s();
+        k();
+        window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.oAudioContext || window.msAudioContext;
+        var j = new AudioContext(), c = 5, r = c, d = location.search ? location.search.replace("?mp3=", "") : "../music/nxn.mp3", l = "", m = {}, e = 0, q = j.createAnalyser();
+        audio = new Audio(d), source = j.createMediaElementSource(audio), output = new Uint8Array(5), getLrc = function () {
+            var g = new XMLHttpRequest();
+            g.onload = function () {
+                var x = this.responseText, w = x.split("\n"), v = w.length, y = /\[(\d+):(\d+)[:.](\d+)\]/g, u, t;
+                while (v--) {
+                    t = "";
+                    while (u = y.exec(w[v])) {
+                        if (!t) {
+                            t = w[v].substr(w[v].lastIndexOf("]") + 1)
+                        }
+                        m[u[1] * 60 + u[2] * 1 + u[3] / 100] = t
+                    }
+                }
+            };
+            g.open("GET", "../music/nxn.txt", true);
+            g.send(null)
+        };
+        location.search || getLrc();
+        source.connect(q);
+        q.connect(j.destination);
+        audio.addEventListener("timeupdate", function () {
+            e = this.currentTime + 0.2;
+            q.getByteFrequencyData(output);
+            r = Math.max.apply(null, output)
+        }, false);
+        audio.autoplay = true
+    })();
+
+</script>
+</body>
+</html>
